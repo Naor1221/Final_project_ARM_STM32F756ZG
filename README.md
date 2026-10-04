@@ -40,27 +40,27 @@ STM32F756ZG
 USB to USB cable
 GPIO pins: 
    UART:
-      uart5 tx -PC12
-      uart5 rx -PD2
+   uart5 tx -PC12
+   uart5 rx -PD2
     
-      uart7 rx -PE7
-      uart7 tx -PE8
+   uart7 rx -PE7
+   uart7 tx -PE8
     
-    SPI:
-      spi1 sck -PA5
-      spi1 miso -PA6
-      spi1 mosi -PB5
+   SPI:
+   spi1 sck -PA5
+   spi1 miso -PA6
+   spi1 mosi -PB5
     
-      spi4 sck -PE2
-      spi4 miso -PE5
-      spi4 mosi -PE6
+   spi4 sck -PE2
+   spi4 miso -PE5
+   spi4 mosi -PE6
     
-    I2C:
-      i2c1 scl -PB8
-      i2c1 sda -PB9
+   I2C:
+   i2c1 scl -PB8
+   i2c1 sda -PB9
       
-      i2c4 scl -PF14
-      i2c4 sda -PF15
+   i2c4 scl -PF14
+   i2c4 sda -PF15
 
 
 DMA: 
