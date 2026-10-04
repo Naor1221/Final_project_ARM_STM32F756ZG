@@ -39,7 +39,7 @@ Hardware requirements:
 STM32F756ZG
 USB to USB cable
 GPIO pins: 
-    UART:
+   UART:
       uart5 tx -PC12
       uart5 rx -PD2
     
@@ -61,6 +61,7 @@ GPIO pins:
       
       i2c4 scl -PF14
       i2c4 sda -PF15
+
 
 DMA: 
   SPI1_RX DMA2 STREAM2
