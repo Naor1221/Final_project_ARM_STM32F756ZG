@@ -10,7 +10,7 @@
 
 
 
-
+/*global variables, volatile and callback variable*/
 volatile uint8_t callback_flag=0;
 struct udp_pcb* upcb;
 ip_addr_t dest_ipaddr;
@@ -44,6 +44,7 @@ enum which_prif{
 	ADC_p=16
 };
 
+/*Callbacks:*/
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
 	flag_r=1;
@@ -88,7 +89,9 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc) {
 }
 
 
-
+/*Callback function for udp
+ * works when a new structure is sent from PC
+ * */
 void udp_receive_callback(void* arg, struct udp_pcb* upcb, struct pbuf* p, const ip_addr_t* addr, u16_t port)
 {
 	//checks if we are free to receive new struct(callback_flag==0 is needed)
@@ -107,7 +110,9 @@ void udp_receive_callback(void* arg, struct udp_pcb* upcb, struct pbuf* p, const
 	pbuf_free(p);
 }
 
-
+/*Send packet back to PC
+ * returns  ERR_OK if sending was done
+ * */
 err_t send_packet(struct udp_pcb* pcb, const void* payload, size_t payload_size, const ip_addr_t* ipaddr, u16_t port)
 {
     err_t err;
@@ -132,7 +137,7 @@ err_t send_packet(struct udp_pcb* pcb, const void* payload, size_t payload_size,
     return err;
 }
 
-
+/*Initiate udp server*/
 void udp_server_init(void) {
 	//create control block structure
 	upcb = udp_new();
@@ -147,7 +152,9 @@ void udp_server_init(void) {
    }
 }
 
-//simple suitable implementation for uint8_t of strlen
+/*Simple suitable implementation for uint8_t of strlen
+* str - Pointer to the byte string terminated by '\0'
+*/
 uint8_t my_strlen(uint8_t *str){
 	uint8_t count=0;
 	while(str[count]!='\0'){
@@ -156,7 +163,11 @@ uint8_t my_strlen(uint8_t *str){
 	return count;
 }
 
-//simple suitable implementation for uint8_t of strcmp
+/*Simple suitable implementation for uint8_t of strcmp
+* str1  - first pointer to uint8_t string
+* str2  - second pointer to uint8_t string
+* return 0 if both string are equal, 1 if not.
+*/
 int my_strcmp(uint8_t *str1,uint8_t *str2){
 	int count=0;
 	while(str1[count]!='\0' || str2[count]!='\0'){
@@ -167,6 +178,10 @@ int my_strcmp(uint8_t *str1,uint8_t *str2){
 	}
 	return 0;
 }
+/*Checks which peripheries is on
+ * Receive uint8_t value
+ * Update peripheries flags.
+ *  */
 void peripheral_being_tested(uint8_t per_tested){
 	uint8_t mask=1;
 	for(int i=0;i<5;i++){
@@ -192,6 +207,7 @@ void peripheral_being_tested(uint8_t per_tested){
 	}
 }
 
+/*Reset peripheries flags */
 void reset_prif_flags(void){
 	flag_timer_prif=0;
 	flag_uart_prif=0;
@@ -201,115 +217,18 @@ void reset_prif_flags(void){
 }
 
 
-//void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
-//	flag_r=1;
-//}
-//
-//void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart){
-//	flag_t=1;
-//}
 
 
-//int uart_test_function(void){
-//	int result=-1;
-//	uint8_t buf4[256]={0};
-//	uint8_t buf5[256]={0};
-//	uint32_t crc_val=0,crc_cmp_val=0;
-//	HAL_StatusTypeDef stat;
-//	uint8_t len_buf5=0,len_buf4=0;
-//	struct loop_steps l_steps[3]={
-//			{&huart5,&huart4,buf5,m1.message,m1.mess_len},
-//			{&huart4,&huart5,buf4,buf5,len_buf5},
-//			{&huart5,&huart4,buf5,buf4,len_buf4}
-//	};
-//	if(m1.mess_len>100){
-//		crc_val=HAL_CRC_Calculate(&hcrc, (uint32_t *)m1.message, m1.mess_len);
-//	}
-//	for(uint8_t i=0;i<m1.itr;i++){
-//		for(uint8_t j=0;j<3;j++){
-//			if(j==1){
-//				//update len_buf5 (another indication buf5 was really transfered)
-//				len_buf5=my_strlen(buf5);
-//				l_steps[j].data_len=len_buf5;
-//			}
-//			else if(j==2){
-//				//update len_buf4 (another indication buf4 was really transfered)
-//				len_buf4=my_strlen(buf4);
-//				l_steps[j].data_len=len_buf4;
-//				//reset buf5 for making sure, the data is really came from buf4
-//				memset(buf5,0,len_buf5);
-//			}
-//			stat=HAL_UART_Receive_DMA(l_steps[j].rec_prif, l_steps[j].rec_data,l_steps[j].data_len);
-//			if(stat!=HAL_OK){
-//				return 0;
-//			}
-//			stat=HAL_UART_Transmit_DMA(l_steps[j].send_prif,l_steps[j].send_data,l_steps[j].data_len);
-//			if(stat!=HAL_OK){
-//				return 0;
-//			}
-//			//making sure data transmitted and received
-//			while((flag_r==0) &&(flag_t==0)){
-//
-//			}
-//			flag_r=0;
-//			flag_t=0;
-//
-//		}
-//
-//		if(m1.mess_len>100){
-//			crc_cmp_val=HAL_CRC_Calculate(&hcrc, (uint32_t *)buf5, m1.mess_len);
-//			if(crc_val==crc_cmp_val){
-//				result=1;
-//			}
-//			else{
-//				result=0;
-//				return result;
-//			}
-//		}
-//		else{
-//			if(strcmp(buf5,m1.message)==0){
-//				result=1;
-//			}
-//			else{
-//				result=0;
-//				return result;
-//			}
-//
-//		}
-//		//reset buf5 and buf4 before every external iteration
-//		memset(buf5,0,len_buf5);
-//		memset(buf4,0,len_buf4);
-//
-//	}
-//	return result;
-//}
 
-
-//timers jump after 1 sec
-//tim1 is Master
-//tim4 is slave
-//volatile int flag_tim1=0;
-//volatile int flag_tim4=0;
-//volatile uint32_t count_tim1=0,count_tim4=0;
-//void HAL_TIM_OC_DelayElapsedCallback(TIM_HandleTypeDef *htim){
-//	if(htim->Instance==TIM1){
-//		count_tim1 = __HAL_TIM_GET_COMPARE(htim, TIM_CHANNEL_1);
-//		flag_tim1=1;
-//	}
-//	else if(htim->Instance==TIM4){
-//		count_tim4 = __HAL_TIM_GET_COMPARE(htim, TIM_CHANNEL_1);
-//		flag_tim4=1;
-//	}
-//}
-
-
-//checking if advance timer (timer1) count to the same ARR as general purpose does
-//both timers use output compare mode
-//one pulse mode is enabled,making sure every iteration each timer counts once.
+/*checking if advance timer (timer1) count to the same ARR as general purpose(timer4) does.
+ *Both timers use output compare mode.
+ *One pulse mode is enabled,making sure every iteration each timer counts once.
+ *Function returns result:
+ * result equals to 0 means failure
+ * result equals to 1 means success
+ */
 int timer_test_function(void){
 	HAL_StatusTypeDef stat;
-	MX_TIM1_Init();
-	MX_TIM4_Init();
 	int result=-1;
 	for(uint8_t i=0;i<m1.itr;i++){
 		stat=HAL_TIM_OC_Start_IT(&htim4, TIM_CHANNEL_1);
@@ -342,95 +261,11 @@ int timer_test_function(void){
 }
 
 
-//volatile int spi_rx=0;
-//volatile int spi_tx=0;
-//void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef *hspi){
-//	spi_rx=1;
-//}
-//void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi){
-//	spi_tx=1;
-//}
-
-//int spi_test_function(void){
-//	int result=-1;
-//	MX_SPI1_Init();
-//	MX_SPI4_Init();
-//	uint8_t buf_m1[256]={0};
-//	uint8_t buf_s4[256]={0};
-//	uint32_t crc_val=0,crc_cmp_val=0;
-//	HAL_StatusTypeDef stat;
-//	uint8_t len_buf_m1=0,len_buf_s4=0;
-//	struct loop_steps l_steps[3]={
-//			{&hspi4,&hspi1,buf_s4,m1.message,m1.mess_len},
-//			{&hspi4,&hspi1,buf_m1,buf_s4,len_buf_s4},
-//			{&hspi4,&hspi1,buf_s4,buf_m1,len_buf_m1}
-//	};
-//	if(m1.mess_len>100){
-//		crc_val=HAL_CRC_Calculate(&hcrc, (uint32_t *)m1.message, m1.mess_len);
-//	}
-//	for(uint8_t i=0;i<m1.itr;i++){
-//		for(uint8_t j=0;j<3;j++){
-//			if(j==1){
-//				//update len_buf_s4(another indication buf_s4 was really transfered)
-//				len_buf_s4=my_strlen(buf_s4);
-//				l_steps[j].data_len=len_buf_s4;
-//			}
-//			else if(j==2){
-//				//update len_buf4 (another indication buf4 was really transfered)
-//				len_buf_m1=my_strlen(buf_m1);
-//				l_steps[j].data_len=len_buf_m1;
-//				//reset buf_s4 for making sure, the data is really came from buf_m1
-//				memset(buf_s4,0,len_buf_s4);
-//			}
-//			stat=HAL_SPI_Receive_DMA(l_steps[j].rec_prif, l_steps[j].rec_data,l_steps[j].data_len);
-//			if(stat!=HAL_OK){
-//				return 0;
-//			}
-//			stat=HAL_SPI_Transmit_DMA(l_steps[j].send_prif,l_steps[j].send_data,l_steps[j].data_len);
-//			if(stat!=HAL_OK){
-//				return 0;
-//			}
-//			while((spi_rx==0)&&(spi_tx==0)){
-//
-//			}
-//			spi_rx=0;
-//			spi_tx=0;
-//
-//
-//
-//		}
-//
-//		if(m1.mess_len>100){
-//			crc_cmp_val=HAL_CRC_Calculate(&hcrc, (uint32_t *)buf_s4, m1.mess_len);
-//			if(crc_val==crc_cmp_val){
-//				result=1;
-//			}
-//			else{
-//				result=0;
-//				return result;
-//			}
-//		}
-//		else{
-//			if(strcmp(buf_s4,m1.message)==0){
-//				result=1;
-//			}
-//			else{
-//				result=0;
-//				return result;
-//			}
-//
-//		}
-//		//reset buf5 and buf4 before every external iteration
-//		memset(buf_s4,0,len_buf_s4);
-//		memset(buf_m1,0,len_buf_m1);
-//
-//	}
-//	return result;
-//}
-
-
-
-//test function for UART, SPI and I2C
+/*test function for UART, SPI and I2C.
+ * Returns result:
+ * result equals to 0 means failure
+ * result equals to 1 means success
+ * */
 int prif_test_function(void* prif_rec,void* prif_send,uint16_t addr_master,uint16_t addr_slave,int prif,volatile int *flag_r,volatile int *flag_t){
 	int result=0;
 	uint8_t buf1[256]={0};
@@ -438,13 +273,7 @@ int prif_test_function(void* prif_rec,void* prif_send,uint16_t addr_master,uint1
 	uint32_t crc_val=0,crc_cmp_val=0;
 	HAL_StatusTypeDef stat;
 	uint8_t len_buf1=0,len_buf2=0;
-//	MX_UART5_Init();
-//	MX_UART7_Init();
-//	MX_DMA_Init();
-//	MX_SPI1_Init();
-//	MX_SPI4_Init();
-//	MX_I2C1_Init();
-//	MX_I2C4_Init();
+
 	struct loop_steps l_steps[3];
 	//default setting suitable to uart case
 	l_steps[0]=(struct loop_steps){prif_rec,prif_send,addr_master,addr_slave,buf1,m1.message,m1.mess_len};
@@ -455,21 +284,13 @@ int prif_test_function(void* prif_rec,void* prif_send,uint16_t addr_master,uint1
 
 	case SPI_p:{
 
-//		l_steps[0]=(struct loop_steps){prif_rec,prif_send,addr_master,addr_slave,buf1,m1.message,m1.mess_len};
 		l_steps[1]=(struct loop_steps){prif_rec,prif_send,addr_master,addr_slave,buf2,buf1,len_buf1};
-//		l_steps[2]=(struct loop_steps){prif_rec,prif_send,addr_master,addr_slave,buf1,buf2,len_buf2};
-//		MX_SPI1_Init();
-//		MX_SPI4_Init();
-//		MX_DMA_Init();
 
 		break;
 	}
 	case I2C_p:{
-//		l_steps[0]=(struct loop_steps){prif_rec,prif_send,addr_master,addr_slave,buf1,m1.message,m1.mess_len};
 		l_steps[1]=(struct loop_steps){prif_send,prif_rec,addr_slave,addr_master,buf2,buf1,len_buf1};
-//		l_steps[2]=(struct loop_steps){prif_rec,prif_send,addr_master,addr_slave,buf1,buf2,len_buf2};
-//		MX_I2C1_Init();
-//		MX_I2C4_Init();
+
 		break;
 	}
 	}
@@ -530,7 +351,7 @@ int prif_test_function(void* prif_rec,void* prif_send,uint16_t addr_master,uint1
 					break;
 				}
 			}
-			//unsuccessful transmitting or receiving consider as a failure
+			//unsuccessful transmitting or receiving is considered as a failure
 			if( (*(flag_r)==0)||(*(flag_t)==0) ){
 				return 0;
 			}
@@ -561,8 +382,9 @@ int prif_test_function(void* prif_rec,void* prif_send,uint16_t addr_master,uint1
 	return result;
 }
 
-//Converte analog input from built in sensor on board
-//return temperature value
+/*Converte analog input from built in sensor on board.
+  Returns temperature value
+ */
 double measure_temp(void){
 	HAL_StatusTypeDef stat;
 	volatile uint16_t adc_raw_temp = 0;
@@ -576,7 +398,9 @@ double measure_temp(void){
 
 	}
 	flag_tmp=0;
+	//conversion digital value into voltage
 	vsense=(hadc1.Instance->DR)*POWER_SUPPLAY_VOLTAGE/MAX_DIGIT_VAL;
+	//finding temperature value using the following formula (reference manual page 441,item 8)
 	temp=((vsense-V25)/(AVG_SLOPE))+25;
 	stat=HAL_ADC_Stop_DMA(&hadc1);
 	if(stat!=HAL_OK){
@@ -585,10 +409,11 @@ double measure_temp(void){
 	return temp;
 }
 
-//Checks the temperature of STM32 using build-in Sensor
-//Temp will be ok if it is between 25 to 50 celsius degrees (C)
+/*Checks the temperature of STM32 using build-in Sensor.
+Temp will be ok if it is between 25 to 50 celsius degrees (C).
+Returns 1 for success, and 0 for failure.
+*/
 int adc_test_function(void){
-//	MX_ADC1_Init();
 	int result=0;
 	double temp;
 	for(uint8_t i=0;i<m1.itr;i++){
@@ -605,7 +430,11 @@ int adc_test_function(void){
 }
 
 
-
+/*This function runs the relevant test per periphery,if it's flag is on.
+ * The function return result:
+ * result equals to 0 means failure
+ * result equals to 1 means success
+ * */
 int test_function(void){
 	int result=0;
 	if(m1.per_tested==0){
@@ -641,7 +470,6 @@ int test_function(void){
 			return result;
 		}
 	}
-	reset_prif_flags();
 	return result;
 
 

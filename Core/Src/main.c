@@ -31,7 +31,6 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-//#include <inttypes.h>
 #include <string.h>
 #include <stdio.h>
 #include "tools.h"
@@ -70,24 +69,27 @@ static void MPU_Config(void);
 /* USER CODE BEGIN 0 */
 //
 void udp_main(void) {
-	printf("Start of program\r\n");
+	printf("start of program\r\n");
 	udp_server_init();
 	int results=0;
+	err_t stat;
 	while (1) {
 		MX_LWIP_Process();
 		if(callback_flag==1){
-			printf("%s\r\n",m1.message);
 			peripheral_being_tested(m1.per_tested);
 			results=test_function();
+			reset_prif_flags();
 			a1.test_id=m1.test_id;
 			if(results==1){
 				a1.test_result=1;
 			}
 			else if(results!=1){
-				a1.test_result=0;
+				a1.test_result=0xff;
 			}
-			send_packet(upcb, &a1, sizeof(a1), &dest_ipaddr, dest_port);
-
+			stat=send_packet(upcb, &a1, sizeof(a1), &dest_ipaddr, dest_port);
+			if(stat!= ERR_OK){
+				printf("Sending packet %"PRIu32" ID was failed",a1.test_id);
+			}
 			callback_flag=0;
 		}
 

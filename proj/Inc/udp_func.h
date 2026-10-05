@@ -82,5 +82,5 @@ err_t send_packet(struct udp_pcb* pcb, const void* payload, size_t payload_size,
 void udp_server_init(void);
 void peripheral_being_tested(uint8_t per_tested);
 int test_function(void);
-
+void reset_prif_flags(void);
 #endif /* INC_UDP_FUNC_H_ */
