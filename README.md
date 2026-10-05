@@ -86,7 +86,9 @@ How to uninstall: Deleting the directory which was downloaded on Github.
 
 How to use: 
   **Notice, the code is separated into files, locating inside proj directory.
-  For running the code, enter to Core directory ->Src directory and run the main.c file. 
+  Download all the files(besides git's) and insert them into a new directory. 
+  Open the directory on cubeIDE.
+  Enter to Core directory ->Src directory and run the main.c file. 
   Then, run the code of PC testing program(see Final_project_ARM_PC_Testing_Program for more details).
 
 Example of using: 
