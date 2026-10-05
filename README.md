@@ -85,6 +85,7 @@ Installation:
 How to uninstall: Deleting the directory which was downloaded on Github.
 
 How to use: 
+ **important details: The server port is 12345 The board gateway address is 12.34.56.1/24 The board IPv4 address is 12.34.56.78/24
   **Notice, the code is separated into files, locating inside proj directory.
   Download all the files(besides git's) and insert them into a new directory. 
   Open the directory on cubeIDE.
